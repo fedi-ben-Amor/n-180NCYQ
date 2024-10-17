@@ -1,0 +1,22 @@
+.fade-scale-enter {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  .fade-scale-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
+  }
+  .fade-scale-exit {
+    opacity: 1;
+  }
+  .fade-scale-exit-active {
+    opacity: 0;
+    transition: opacity 500ms ease-in-out;
+  }
+  
+  .welcome-box {
+    background: linear-gradient(135deg, #4c83ff, #1c37ff);
+    border-radius: 15px;
+  }
+  
