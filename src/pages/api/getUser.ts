@@ -1,4 +1,3 @@
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import fs from 'fs';
 import path from 'path';
@@ -32,8 +31,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       } else {
         return res.status(404).json({ error: 'Utilisateur non trouvé.' });
       }
-    } catch (error) {
-      return res.status(500).json({ error: 'Erreur lors de la récupération des données.' });
+    } catch (err) { 
+      return res.status(500).json({ error: 'Erreur lors de la récupération des données.'+err });
     }
   } else {
     return res.setHeader('Allow', ['GET']).status(405).end(`Method ${req.method} Not Allowed`);

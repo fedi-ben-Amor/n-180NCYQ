@@ -4,9 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from 'next/router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+interface UserData {
+  id: string;
+  nom?: string | null;
+  prenom?: string | null;
+  birthDate?: string | null;
+  adresse?: string | null;
+  numTel?: string | null;
+}
+
 export default function Profile() {
   const { data: session, update } = useSession();
-  const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [distance, setDistance] = useState<number | null>(null);
   const router = useRouter();
@@ -25,15 +33,14 @@ export default function Profile() {
       if (session?.user?.id) {
         const response = await fetch(`/api/getUser?id=${session.user.id}`);
         if (response.ok) {
-          const user = await response.json();
-          setUserData(user);
+          const user: UserData = await response.json();
           setFormData({
             id: user.id,
-            nom: user.nom,
-            prenom: user.prenom,
-            birthDate: user.birthDate,
-            adresse: user.adresse,
-            numTel: user.numTel,
+            nom: user.nom || '',
+            prenom: user.prenom || '',
+            birthDate: user.birthDate || '',
+            adresse: user.adresse || '',
+            numTel: user.numTel || '',
           });
         } else {
           console.error('Utilisateur non trouvé ou erreur lors de la récupération.');
@@ -151,7 +158,7 @@ export default function Profile() {
 
       {distance !== null && (
         <div className="alert alert-info">
-          Distance de l'adresse à Paris : {distance.toFixed(2)} km
+          Distance de l&apos;adresse à Paris : {distance.toFixed(2)} km
         </div>
       )}
     </div>
