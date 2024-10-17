@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "id": "114727795896553507838",
+      "nom": "Ben Amor",
+      "prenom": "Fedi",
+      "email": "benamor.fedi@esprit.tn",
+      "adresse": "Avenue des Champs-Élysées, 75008 Paris, France",
+      "birthDate": "2024-10-02",
+      "numTel": "96857431"
+    }
+  ]
+}

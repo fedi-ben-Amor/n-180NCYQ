@@ -18,7 +18,7 @@ export default function Login() {
       {session ? (
         <div>
           <div className="welcome-box p-5 mb-4 bg-dark text-white rounded shadow">
-            <h2 className="display-4">Bienvenue, {session.user?.name} !</h2>
+            <h2 className="display-4">Bienvenue!</h2>
             <p className="lead">Ravi de vous revoir. Vous êtes connecté avec succès.</p>
           </div>
           <div className="d-flex justify-content-center">
@@ -33,7 +33,6 @@ export default function Login() {
       ) : (
         <div>
           <h1 className="mb-5">Connexion</h1>
-  
           <div className="d-flex flex-column align-items-center">
             <button
               className="btn btn-outline-primary btn-lg mb-3 d-flex align-items-center justify-content-center"

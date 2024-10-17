@@ -1,20 +1,49 @@
-import { validateAddress } from '../utils/validateAddress'; 
+import { validateAddress } from '../utils/validateAddress';
 import { useSession } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from 'next/router'; 
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import { useEffect, useState } from "react";
+import { useRouter } from 'next/router';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Profile() {
-  const { data: session } = useSession();
-  const [formData, setFormData] = useState({
-    name: session?.user?.name || '',
-    firstName: '',
-    birthDate: '',
-    address: '',
-    phoneNumber: ''
-  });
+  const { data: session, update } = useSession();
+  const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [distance, setDistance] = useState<number | null>(null);
-  const router = useRouter(); 
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    id: session?.user?.id || '',
+    nom: '',
+    prenom: '',
+    birthDate: '',
+    adresse: '',
+    numTel: '',
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (session?.user?.id) {
+        const response = await fetch(`/api/getUser?id=${session.user.id}`);
+        if (response.ok) {
+          const user = await response.json();
+          setUserData(user);
+          setFormData({
+            id: user.id,
+            nom: user.nom,
+            prenom: user.prenom,
+            birthDate: user.birthDate,
+            adresse: user.adresse,
+            numTel: user.numTel,
+          });
+        } else {
+          console.error('Utilisateur non trouvé ou erreur lors de la récupération.');
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [session]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -23,17 +52,34 @@ export default function Profile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { isValid, distance } = await validateAddress(formData.address);  
-    setDistance(distance); 
+    const { isValid, distance } = await validateAddress(formData.adresse);
+    setDistance(distance);
 
     if (isValid) {
-      console.log('Adresse validée et informations mises à jour.');
-      alert('Adresse validée avec succès !');
+      const response = await fetch('/api/updateUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const updatedSession = await response.json();
+        update(updatedSession.user); 
+        alert('Informations mises à jour avec succès !');
+      } else {
+        const errorData = await response.json();
+        alert(`Erreur : ${errorData.error || 'Erreur lors de la mise à jour.'}`);
+      }
     } else {
-      console.log(`L'adresse est hors de la zone autorisée. Elle est à ${distance} km de Paris.`);
-      alert(`L'adresse est à ${distance.toFixed(2)} km de Paris, ce qui dépasse la limite de 50 km.`);
+      alert(`L'adresse est à ${distance?.toFixed(2)} km de Paris, ce qui dépasse la limite de 50 km.`);
     }
   };
+
+  if (loading) {
+    return <p>Chargement des données...</p>; 
+  }
 
   if (!session || !session.user) {
     return <p>Veuillez vous connecter.</p>;
@@ -41,14 +87,14 @@ export default function Profile() {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Profil de {session.user.name}</h1>
+      <h1 className="mb-4">Profil de {formData.nom} {formData.prenom}</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="mb-3">
           <label className="form-label">Nom :</label>
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="nom"
+            value={formData.nom}
             onChange={handleInputChange}
             className="form-control"
             required
@@ -58,8 +104,8 @@ export default function Profile() {
           <label className="form-label">Prénom :</label>
           <input
             type="text"
-            name="firstName"
-            value={formData.firstName}
+            name="prenom"
+            value={formData.prenom}
             onChange={handleInputChange}
             className="form-control"
             required
@@ -79,8 +125,8 @@ export default function Profile() {
           <label className="form-label">Adresse :</label>
           <input
             type="text"
-            name="address"
-            value={formData.address}
+            name="adresse"
+            value={formData.adresse}
             onChange={handleInputChange}
             className="form-control"
             required
@@ -90,17 +136,17 @@ export default function Profile() {
           <label className="form-label">Numéro de téléphone :</label>
           <input
             type="text"
-            name="phoneNumber"
-            value={formData.phoneNumber}
+            name="numTel"
+            value={formData.numTel}
             onChange={handleInputChange}
             className="form-control"
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary">Mettre à jour </button>
-        <button className="btn btn-secondary" onClick={() => router.push('/login')}>
-        Retour
-      </button>
+        <button type="submit" className="btn btn-primary">Mettre à jour</button>
+        <button type="button" className="btn btn-secondary" onClick={() => router.push('/login')}>
+          Retour
+        </button>
       </form>
 
       {distance !== null && (
@@ -108,8 +154,6 @@ export default function Profile() {
           Distance de l'adresse à Paris : {distance.toFixed(2)} km
         </div>
       )}
-
-
     </div>
   );
 }
