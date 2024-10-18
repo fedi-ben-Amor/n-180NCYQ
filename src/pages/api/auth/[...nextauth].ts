@@ -15,12 +15,12 @@ interface User {
 export default NextAuth({
   providers: [
     GoogleProvider({
-      clientId: "822390554140-a5r5asbvhn95odl60gs9qspsr8pa6htb.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }), 
     GitHubProvider({
-      clientId: "Ov23liF4DkjQRgfSy20N",
-      clientSecret: "e3f420a34a04589a3cab961b0bd2bf619649811e",
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
